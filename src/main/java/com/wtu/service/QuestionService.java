@@ -1,10 +1,12 @@
 package com.wtu.service;
 
+import com.wtu.advice.CustomizeException;
 import com.wtu.dto.PaginationDTO;
 import com.wtu.dto.QuestionDTO;
 import com.wtu.mapper.QuestionMapper;
 import com.wtu.mapper.UserMapper;
 import com.wtu.model.Question;
+import com.wtu.model.QuestionExample;
 import com.wtu.model.User;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +30,16 @@ public class QuestionService {
 
     public  void CreateOrUpdateQuestion(Question question) {
         if(question.getId()==null) {
-            System.out.println("在添加");
+
             questionMapper.insertQuestion(question);
         }
         else
         {
-            questionMapper.updateQuestion(question);
+            int status=questionMapper.updateQuestion(question);
+            if(status!=1)
+            {
+                throw  new CustomizeException("你找的问题不存在了,换一个试试");
+            }
         }
     }
 
@@ -120,10 +126,23 @@ public class QuestionService {
 
     public QuestionDTO getQuestionById(Integer id) {
         Question question=questionMapper.getQuestionById(id);
+        if(question==null)
+        {
+            throw  new CustomizeException("你找的页面不存在，换一个试试");
+        }
         User user=userMapper.findById(question.getCreator());
         QuestionDTO questionDTO=new QuestionDTO();
         questionDTO.setUser(user);
         BeanUtils.copyProperties(question,questionDTO);
         return  questionDTO;
+    }
+
+    public void addView(Integer id) {
+        Question question =questionMapper.getQuestionById(id);
+        Question updateQuestion=new Question();
+        updateQuestion.setViewCount(question.getViewCount()+1);
+        QuestionExample questionExample=new QuestionExample();
+        questionExample.createCriteria().andIdEqualTo(id);
+        questionMapper.updateByExampleSelective(updateQuestion,questionExample);
     }
 }

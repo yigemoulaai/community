@@ -20,6 +20,7 @@ public class QuestionController {
                              Model model)
     {
         QuestionDTO questionDTO=questionService.getQuestionById(id);
+        questionService.addView(id);
         model.addAttribute(questionDTO);
         return  "questionforme";
     }

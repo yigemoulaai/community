@@ -30,7 +30,7 @@
             </form>
             <ul class="nav navbar-nav navbar-right" >
                 <li th:if="${session.user !=null}">
-                    <a href="/publish"></a>
+                    <a href="/publish" th:href="@{/publish}">发布</a>
                 </li>
                 <li th:if="${session.user == null}">
                     <a href="https://github.com/login/oauth/authorize?client_id=bda55c5704f5f2c8b8bb&redirect_uri=http://localhost:8084/community/callback&scope=user&state=1">登录</a>
